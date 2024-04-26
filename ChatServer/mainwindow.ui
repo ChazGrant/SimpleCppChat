@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTextEdit" name="textEdit">
+   <widget class="QTextEdit" name="serverPortTextEdit">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -73,7 +73,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit_2">
+   <widget class="QTextEdit" name="chatMessageTextEdit">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -83,7 +83,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="sendMessagePushButton">
     <property name="geometry">
      <rect>
       <x>340</x>
@@ -96,7 +96,7 @@
      <string>Отправить сообщение</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="startServerButton">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -109,7 +109,7 @@
      <string>Запуск</string>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="chatTextBrowser_2">
+   <widget class="QTextBrowser" name="eventsTextBrowser">
     <property name="geometry">
      <rect>
       <x>480</x>
@@ -139,7 +139,7 @@
      <x>0</x>
      <y>0</y>
      <width>733</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
