@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>490</width>
-    <height>494</height>
+    <height>521</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>290</x>
       <y>10</y>
       <width>141</width>
       <height>16</height>
@@ -30,9 +30,9 @@
    <widget class="QLabel" name="serverConnectedLabel">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>290</x>
       <y>40</y>
-      <width>111</width>
+      <width>191</width>
       <height>21</height>
      </rect>
     </property>
@@ -40,11 +40,11 @@
      <string/>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit_2">
+   <widget class="QTextEdit" name="messageTextEdit">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>400</y>
+      <y>430</y>
       <width>321</width>
       <height>41</height>
      </rect>
@@ -54,17 +54,17 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>80</y>
+      <y>110</y>
       <width>461</width>
       <height>311</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="sendMessageButton">
     <property name="geometry">
      <rect>
       <x>340</x>
-      <y>400</y>
+      <y>430</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -73,30 +73,30 @@
      <string>Отправить сообщение</string>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit">
+   <widget class="QTextEdit" name="serverPortTextEdit">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>30</y>
+      <x>10</x>
+      <y>70</y>
       <width>104</width>
       <height>31</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="connectToServerButton">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>130</x>
       <y>30</y>
-      <width>81</width>
+      <width>91</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Запуск</string>
+     <string>Подключиться</string>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit_3">
+   <widget class="QTextEdit" name="serverAddressTextEdit">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -117,6 +117,19 @@
     </property>
     <property name="text">
      <string>Задайте адрес и порт для подключения к серверу</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="disconnectFromServer">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>70</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Отключиться</string>
     </property>
    </widget>
   </widget>
