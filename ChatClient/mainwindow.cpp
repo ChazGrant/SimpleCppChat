@@ -23,105 +23,70 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::onSocketConnected()
-{
-    m_serverConnected = true;
-    ui->serverConnectedLabel->setText("Подключение установлено");
-}
-
-void MainWindow::onSocketDisconnected()
-{
-    qDebug() << "Disconnected";
-    m_serverConnected = false;
-    m_webSocket = nullptr;
-    qDebug() << m_webSocket;
-
-    ui->serverConnectedLabel->setText("Подключение не установлено");
-}
-
-void MainWindow::onSocketMessageReceived(const QString t_message)
-{
-    QWebSocket *server = qobject_cast<QWebSocket*>(QObject::sender());
-    addMessageToChat(server->peerAddress().toString(), server->peerPort(), t_message);
-}
-
 void MainWindow::connectToServer()
 {
-    if (m_serverConnected) {
-        return UserNotifier::showMessage("Сервер уже запущен", QMessageBox::Icon::Critical);
-    }
-
-    qDebug() << m_serverConnected;
-    bool converted;
     QString serverAddress = ui->serverAddressTextEdit->toPlainText();
-    int serverPort = ui->serverPortTextEdit->toPlainText().toInt(&converted);
-    if (serverAddress.isEmpty() || !converted) {
-        return UserNotifier::showMessage("Адрес или порт сервера введены неверно", QMessageBox::Icon::Critical);
+    QString serverPort = ui->serverPortTextEdit->toPlainText();
+
+    if (m_chatClient == nullptr) {
+        m_chatClient = new ChatClientModelView();
+    }
+    QString errorMessage;
+    m_chatClient->connectToServer(serverAddress, serverPort, errorMessage);
+    if (!errorMessage.isEmpty()) {
+        return UserNotifier::showMessage(errorMessage, QMessageBox::Icon::Critical);
     }
 
-    QList<QString> serverAddressParts = serverAddress.split(".");
-    if (serverAddressParts.size() != 4) {
-        return UserNotifier::showMessage("Адрес сервера введён неверно", QMessageBox::Icon::Critical);
-    }
-    for (int i = 0; i < serverAddressParts.size(); ++i) {
-        serverAddressParts[i].toInt(&converted);
-        if (!converted) {
-            return UserNotifier::showMessage("Адрес сервера введён неверно", QMessageBox::Icon::Critical);
-        }
-    }
-
-    qDebug() << serverAddressParts;
-
-    QUrl url;
-    url.setScheme("ws");
-    url.setHost(serverAddress);
-    url.setPort(serverPort);
-
-    m_webSocket = new QWebSocket();
-    setSocketSignals();
-    m_webSocket->open(url);
+    setModelViewSignals();
 }
 
 void MainWindow::disconnectFromServer()
 {
-    if (m_serverConnected) {
-        m_webSocket->close();
-        ui->serverConnectedLabel->setText("Подключение не установлено");
-        m_serverConnected = false;
-    } else {
-        return UserNotifier::showMessage("Вы не подключены к серверу", QMessageBox::Icon::Critical);
+    QString errorMessage;
+    m_chatClient->disconnectFromServer(errorMessage);
+    if (!errorMessage.isEmpty()) {
+        UserNotifier::showMessage(errorMessage, QMessageBox::Icon::Critical);
     }
 }
 
-void MainWindow::setSocketSignals()
+void MainWindow::onChatSocketConnected()
 {
-    disconnect(m_webSocket, &QWebSocket::connected, this, &MainWindow::onSocketConnected);
-    disconnect(m_webSocket, &QWebSocket::disconnected, this, &MainWindow::onSocketDisconnected);
-    disconnect(m_webSocket, &QWebSocket::textMessageReceived, this, &MainWindow::onSocketMessageReceived);
+    ui->serverConnectedLabel->setText("Подключение установлено");
+}
 
-    connect(m_webSocket, &QWebSocket::connected, this, &MainWindow::onSocketConnected);
-    connect(m_webSocket, &QWebSocket::disconnected, this, &MainWindow::onSocketDisconnected);
-    connect(m_webSocket, &QWebSocket::textMessageReceived, this, &MainWindow::onSocketMessageReceived);
+void MainWindow::onChatSocketDisconnected()
+{
+    ui->serverConnectedLabel->setText("Подключение не установлено");
 }
 
 void MainWindow::sendMessage()
 {
-    if (!m_serverConnected) {
-        return UserNotifier::showMessage("Вы не подключены к серверу", QMessageBox::Icon::Critical);
-    }
+    QString errorMessage;
     QString messageText = ui->messageTextEdit->toPlainText();
-    if (messageText.isEmpty()) {
-        return UserNotifier::showMessage("Сообщение не может быть пустым", QMessageBox::Icon::Critical);
+    m_chatClient->sendMessage(messageText, errorMessage);
+    if (!errorMessage.isEmpty()) {
+        return UserNotifier::showMessage(errorMessage, QMessageBox::Icon::Critical);
     }
 
-    m_webSocket->sendTextMessage(messageText);
-    addMessageToChat(m_webSocket->localAddress().toString(), m_webSocket->localPort(), messageText);
+    ui->messageTextEdit->clear();
 }
 
-void MainWindow::addMessageToChat(const QString t_senderAddress, const int t_senderPort, const QString t_textMessage)
+void MainWindow::updateChatMessages(const QString t_senderName, QString t_textMessage)
 {
     QString chatMessages = ui->chatTextBrowser->toPlainText();
-    ui->chatTextBrowser->setText(chatMessages +
-                                     QString("\nНовое сообщение от %1:%2\n%3").arg(
-                                    t_senderAddress, QString::number(t_senderPort), t_textMessage));
+    ui->chatTextBrowser->setText(chatMessages + QString("\nНовое сообщение от %1\n%2").
+                                 arg(t_senderName, t_textMessage));
+}
+
+void MainWindow::setModelViewSignals()
+{
+    disconnect(m_chatClient, &ChatClientModelView::chatSocketConnected, this, &MainWindow::onChatSocketConnected);
+    disconnect(m_chatClient, &ChatClientModelView::chatSocketDisconnected, this, &MainWindow::onChatSocketDisconnected);
+    disconnect(m_chatClient, &ChatClientModelView::chatSocketMessageReceived, this, &MainWindow::updateChatMessages);
+    disconnect(m_chatClient, &ChatClientModelView::serverReceivedMessage, this, &MainWindow::updateChatMessages);
+
+    connect(m_chatClient, &ChatClientModelView::chatSocketConnected, this, &MainWindow::onChatSocketConnected);
+    connect(m_chatClient, &ChatClientModelView::chatSocketDisconnected, this, &MainWindow::onChatSocketDisconnected);
+    connect(m_chatClient, &ChatClientModelView::chatSocketMessageReceived, this, &MainWindow::updateChatMessages);
+    connect(m_chatClient, &ChatClientModelView::serverReceivedMessage, this, &MainWindow::updateChatMessages);
 }

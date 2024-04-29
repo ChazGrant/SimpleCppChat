@@ -7,6 +7,7 @@
 #include <QMessageBox>
 
 #include "usernotifier.h"
+#include "chatclientmodelview.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -22,21 +23,20 @@ public:
     ~MainWindow();
 
 private slots:
-    void onSocketConnected();
-    void onSocketDisconnected();
-    void onSocketMessageReceived(const QString t_message);
-
     void connectToServer();
     void disconnectFromServer();
 
-    void setSocketSignals();
+    void onChatSocketConnected();
+    void onChatSocketDisconnected();
 
     void sendMessage();
-    void addMessageToChat(const QString t_senderAddress, const int t_senderPort, const QString t_textMessage);
+    void updateChatMessages(const QString t_senderName, QString t_textMessage);
 private:
     Ui::MainWindow *ui;
 
     bool m_serverConnected = false;
-    QWebSocket *m_webSocket;
+    ChatClientModelView *m_chatClient = nullptr;
+
+    void setModelViewSignals();
 };
 #endif // MAINWINDOW_H
