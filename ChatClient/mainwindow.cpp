@@ -62,6 +62,9 @@ void MainWindow::disconnectFromServer()
     if (!errorMessage.isEmpty()) {
         UserNotifier::showMessage(errorMessage, QMessageBox::Icon::Critical);
     }
+    if (!m_chatClient->m_lastSentMessage.isEmpty()) {
+        UserNotifier::showMessage("Ваше последнее сообщение не было доставлено из-за обрыва соединения", QMessageBox::Icon::Critical);
+    }
 }
 
 /*! @brief Событие при подключении сокета к серверу

@@ -20,6 +20,9 @@ public:
     void connectToServer(QString t_serverAddress, QString t_serverPort, QString &t_errorMessage);
     void disconnectFromServer(QString &t_errorMessage);
     void sendMessage(const QString t_messageText, QString &t_errorMessage);
+
+    //! Последнее отправленное сообщение
+    QString m_lastSentMessage;
 private slots:
     void onSocketConnected();
     void onSocketDisconnected();
@@ -37,8 +40,6 @@ private:
     QString m_serverAddress;
     //! Порт сервера к которому подключаемся
     QString m_serverPort;
-    //! Последнее отправленное сообщение
-    QString m_lastSentMessage;
 
     //! Установлено ли соединение
     bool m_connectionEstablished = false;
