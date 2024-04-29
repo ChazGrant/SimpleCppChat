@@ -39,6 +39,7 @@ private:
     void addMessageToChat(const QString t_senderName, const QString t_textMessage);
     void updateEvents(const QString t_newEvent);
 
+    //! Указатель на ModelView чата
     ChatServerModelView *m_chatServer = nullptr;
     void setServerSignals();
 };

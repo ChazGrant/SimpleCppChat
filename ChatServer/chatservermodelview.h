@@ -29,8 +29,11 @@ private slots:
     void onMessageReceived(const QString t_message);
 
 private:
+    //! Указатель на сокет клиента
     QWebSocket *m_client;
+    //! Указатель на сокет запущенного сервера
     QWebSocketServer *m_server;
+    //! Указатель на класс обработчика базы данных
     DatabaseAccessor m_dbAccessor = DatabaseAccessor::getInstance();
 
     void addMessageToDatabase(const QString t_senderName, const QString t_messageText, QString &t_errorMessage);

@@ -2,6 +2,12 @@
 #include "ui_mainwindow.h"
 
 
+/*! @brief Конструктор класса
+ *
+ *  @param *parent Указатель на родительское окно класса
+ *
+ *  @return MainWindow
+*/
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -18,11 +24,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->serverConnectedLabel->setText("Подключение не установлено");
 }
 
+//! @brief Деструктор класса
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
+/*! @brief Подключение к серверу
+ *
+ *  @return void
+*/
 void MainWindow::connectToServer()
 {
     QString serverAddress = ui->serverAddressTextEdit->toPlainText();
@@ -40,6 +51,10 @@ void MainWindow::connectToServer()
     setModelViewSignals();
 }
 
+/*! @brief Отключение от сервера
+ *
+ *  @return void
+*/
 void MainWindow::disconnectFromServer()
 {
     QString errorMessage;
@@ -49,16 +64,28 @@ void MainWindow::disconnectFromServer()
     }
 }
 
+/*! @brief Событие при подключении сокета к серверу
+ *
+ *  @return void
+*/
 void MainWindow::onChatSocketConnected()
 {
     ui->serverConnectedLabel->setText("Подключение установлено");
 }
 
+/*! @brief Событие при отключении сокета от сервера
+ *
+ *  @return void
+*/
 void MainWindow::onChatSocketDisconnected()
 {
     ui->serverConnectedLabel->setText("Подключение не установлено");
 }
 
+/*! @brief Отправка сообщения на сервер
+ *
+ *  @return void
+*/
 void MainWindow::sendMessage()
 {
     QString errorMessage;
@@ -71,6 +98,10 @@ void MainWindow::sendMessage()
     ui->messageTextEdit->clear();
 }
 
+/*! @brief Обновление сообщений чата
+ *
+ *  @return void
+*/
 void MainWindow::updateChatMessages(const QString t_senderName, QString t_textMessage)
 {
     QString chatMessages = ui->chatTextBrowser->toPlainText();
@@ -78,6 +109,10 @@ void MainWindow::updateChatMessages(const QString t_senderName, QString t_textMe
                                  arg(t_senderName, t_textMessage));
 }
 
+/*! @brief Установка сигналов для сокета клиента
+ *
+ *  @return void
+*/
 void MainWindow::setModelViewSignals()
 {
     disconnect(m_chatClient, &ChatClientModelView::chatSocketConnected, this, &MainWindow::onChatSocketConnected);

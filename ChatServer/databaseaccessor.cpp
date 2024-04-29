@@ -1,11 +1,24 @@
 #include "databaseaccessor.h"
 
+
+/*! @brief Получение объекта базы данных
+ *
+ *  @return DatabaseAccessor
+*/
 DatabaseAccessor &DatabaseAccessor::getInstance()
 {
     static DatabaseAccessor instance;
     return instance;
 }
 
+/*! @brief Добавление сообщения в базу данных
+ *
+ *  @param t_senderName Имя отправителя
+ *  @param t_messageText Текст сообщения
+ *  @param t_errorMessage Ошибка, которую может вернуть метод
+ *
+ *  @return void
+*/
 void DatabaseAccessor::addMessageToDatabase(const QString t_senderName, const QString t_messageText, QString &t_errorMessage)
 {
     m_query.prepare("INSERT INTO ChatMessages(senderName, messageText) VALUES(:senderName, :messageText)");
@@ -21,11 +34,16 @@ void DatabaseAccessor::addMessageToDatabase(const QString t_senderName, const QS
     m_db.commit();
 }
 
+/*! @brief Получение последней ошибки базы данных
+ *
+ *  @return void
+*/
 const QString DatabaseAccessor::getLastError()
 {
     return m_db.lastError().text();
 }
 
+//! @brief Констркутор класса
 DatabaseAccessor::DatabaseAccessor()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
@@ -36,6 +54,10 @@ DatabaseAccessor::DatabaseAccessor()
     initTables();
 }
 
+/*! @brief Создание таблиц базы данных
+ *
+ *  @return void
+*/
 void DatabaseAccessor::initTables()
 {
     m_query.exec("CREATE TABLE IF NOT EXISTS ChatMessages(messageId INTEGER PRIMARY KEY AUTOINCREMENT, senderName VARCHAR(20), messageText TEXT)");

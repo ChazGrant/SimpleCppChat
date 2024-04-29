@@ -5,6 +5,13 @@ UserNotifier::UserNotifier()
 
 }
 
+/*! @brief Вывод сообщения на экран
+ *
+ *  @param t_messageText Текст сообщения
+ *  @param t_messageIcon Иконка окна сообщения
+ *
+ *  @return void
+*/
 void UserNotifier::showMessage(const QString t_messageText, const QMessageBox::Icon t_messageIcon)
 {
     QMessageBox msgBox;

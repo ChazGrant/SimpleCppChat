@@ -1,16 +1,29 @@
 #include "chatclientmodelview.h"
 
 
+//! @brief Конструктор класса
 ChatClientModelView::ChatClientModelView()
 {
 
 }
 
+/*! @brief Получение имени отправителя
+ *
+ *  @return const QString
+*/
 const QString ChatClientModelView::getSenderName()
 {
     return m_chatSocket->localAddress().toString() + ":" + QString::number(m_chatSocket->localPort());
 }
 
+/*! @brief Подключение к серверу
+ *
+ *  @param t_serverAddress Адрес сервера
+ *  @param t_serverPort Порт сервера
+ *  @param t_errorMessage Ошибка, который может вернуть данный метод
+ *
+ *  @return void
+*/
 void ChatClientModelView::connectToServer(QString t_serverAddress, QString t_serverPort, QString &t_errorMessage)
 {
     if (m_connectionEstablished) {
@@ -48,6 +61,12 @@ void ChatClientModelView::connectToServer(QString t_serverAddress, QString t_ser
     m_chatSocket->open(url);
 }
 
+/*! @brief Отключение от сервера
+ *
+ *  @param &t_errorMessage Ошибка, который может вернуть данный метод
+ *
+ *  @return void
+*/
 void ChatClientModelView::disconnectFromServer(QString &t_errorMessage)
 {
     if (!m_connectionEstablished) {
@@ -59,6 +78,13 @@ void ChatClientModelView::disconnectFromServer(QString &t_errorMessage)
     return;
 }
 
+/*! @brief Отправка сообщения
+ *
+ *  @param t_messageText Текст сообщения
+ *  @param &t_errorMessage Ошибка, который может вернуть данный метод
+ *
+ *  @return void
+*/
 void ChatClientModelView::sendMessage(const QString t_messageText, QString &t_errorMessage)
 {
     if (!m_messageReceivedByServer && m_lastSentMessage.size()) {
@@ -80,6 +106,10 @@ void ChatClientModelView::sendMessage(const QString t_messageText, QString &t_er
     return;
 }
 
+/*! @brief Событие при подключении сокета к серверу
+ *
+ *  @return void
+*/
 void ChatClientModelView::onSocketConnected()
 {
     qDebug() << "Socket Connected";
@@ -87,6 +117,10 @@ void ChatClientModelView::onSocketConnected()
     emit chatSocketConnected();
 }
 
+/*! @brief Событие при отключении сокета от сервера
+ *
+ *  @return void
+*/
 void ChatClientModelView::onSocketDisconnected()
 {
     qDebug() << "Socket Disconnected";
@@ -96,6 +130,10 @@ void ChatClientModelView::onSocketDisconnected()
     emit chatSocketDisconnected();
 }
 
+/*! @brief Событие при получении сообщения от сервера
+ *
+ *  @return void
+*/
 void ChatClientModelView::onSocketMessageReceived(const QString t_message)
 {
     QWebSocket *senderSocket = qobject_cast<QWebSocket*>(QObject::sender());
@@ -105,6 +143,10 @@ void ChatClientModelView::onSocketMessageReceived(const QString t_message)
     emit chatSocketMessageReceived(socketName, t_message);
 }
 
+/*! @brief Событие срабатываемое когда сервер получил сообщение
+ *
+ *  @return void
+*/
 void ChatClientModelView::onServerMessageReceived(const QByteArray &t_message)
 {
     const QString receivedMessage = QString(t_message);
@@ -114,6 +156,11 @@ void ChatClientModelView::onServerMessageReceived(const QByteArray &t_message)
         m_lastSentMessage = "";
     }
 }
+
+/*! @brief Установка сигналов для сокета
+ *
+ *  @return void
+*/
 void ChatClientModelView::setSocketSignals()
 {
     disconnect(m_chatSocket, &QWebSocket::connected, this, &ChatClientModelView::onSocketConnected);

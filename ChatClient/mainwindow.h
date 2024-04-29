@@ -34,7 +34,9 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+    //! Подключён ли клиент к серверу
     bool m_serverConnected = false;
+    //! Указатель на класс ChatClientModelView
     ChatClientModelView *m_chatClient = nullptr;
 
     void setModelViewSignals();

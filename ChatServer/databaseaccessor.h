@@ -22,7 +22,9 @@ private:
 
     void initTables();
 
+    //! Запрос к базе данных
     QSqlQuery m_query;
+    //! Объект базы данных
     QSqlDatabase m_db;
 };
 

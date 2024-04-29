@@ -1,6 +1,7 @@
 #include "chatservermodelview.h"
 
 
+//! @brief Конструктор класса
 ChatServerModelView::ChatServerModelView()
 {
     const QString serverName = "ChatWebSocketServer";
@@ -12,11 +13,19 @@ ChatServerModelView::ChatServerModelView()
     QString errorMessage;
 }
 
+//! @brief Получение адреса сервера
 const QString ChatServerModelView::getSenderName()
 {
     return m_server->serverAddress().toString() + ":" + QString::number(m_server->serverPort());
 }
 
+/*! @brief Запуск сервера
+ *
+ *  @param t_serverPort Порт запускаемого сервера
+ *  @param t_errorMessage Ошибка, которую может вернуть метод
+ *
+ *  @return void
+*/
 void ChatServerModelView::startServer(const QString t_serverPort, QString &t_errorMessage)
 {
     bool converted;
@@ -40,6 +49,13 @@ void ChatServerModelView::startServer(const QString t_serverPort, QString &t_err
     }
 }
 
+/*! @brief Отправка сообщений клиенту
+ *
+ *  @param t_messageText Текст сообщения, которое будет оптравлено
+ *  @param t_errorMessage Ошибка, которую может вернуть метод
+ *
+ *  @return void
+*/
 void ChatServerModelView::sendMessageToClient(QString t_messageText, QString &t_errorMessage)
 {
     if (t_messageText.isEmpty()) {
@@ -60,6 +76,10 @@ void ChatServerModelView::sendMessageToClient(QString t_messageText, QString &t_
     }
 }
 
+/*! @brief Событие при подключении клиента к серверу
+ *
+ *  @return void
+*/
 void ChatServerModelView::onClientConnected()
 {
     QWebSocket *connectedSocket = m_server->nextPendingConnection();
@@ -73,12 +93,22 @@ void ChatServerModelView::onClientConnected()
     connect(connectedSocket, &QWebSocket::textMessageReceived, this, &ChatServerModelView::onMessageReceived);
 }
 
+/*! @brief Событие при отключении клиента от сервера
+ *
+ *  @return void
+*/
 void ChatServerModelView::onClientDisconnected()
 {
     m_client = nullptr;
     emit clientDisconnected();
 }
 
+/*! @brief Событие при получении сообщения от клиента
+ *
+ *  @param t_message Сообщение, которое отправил клиент
+ *
+ *  @return void
+*/
 void ChatServerModelView::onMessageReceived(const QString t_message)
 {
     QWebSocket *socket = qobject_cast<QWebSocket*>(QObject::sender());

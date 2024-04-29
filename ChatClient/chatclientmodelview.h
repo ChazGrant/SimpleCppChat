@@ -33,12 +33,18 @@ signals:
     void serverReceivedMessage(const QString t_chatClientName, const QString t_lastSentMessage);
 
 private:
+    //! Адрес сервера к которому подключаемся
     QString m_serverAddress;
+    //! Порт сервера к которому подключаемся
     QString m_serverPort;
+    //! Последнее отправленное сообщение
     QString m_lastSentMessage;
 
+    //! Установлено ли соединение
     bool m_connectionEstablished = false;
+    //! Получено ли сообщение сервером
     bool m_messageReceivedByServer = false;
+    //! Сокет, котороый подключается к серверу
     QWebSocket *m_chatSocket;
 
     void setSocketSignals();

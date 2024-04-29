@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 
+//! @brief Конструктор класса
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -16,11 +17,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->clientOnlineLabel->setText("Клиент не подключен");
 }
 
+//! @brief Деструктор класса
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
+/*! @brief Запуск сервера
+ *
+ *  @return void
+*/
 void MainWindow::startServer()
 {
     QString serverPort = ui->serverPortTextEdit->toPlainText();
@@ -36,6 +42,10 @@ void MainWindow::startServer()
     UserNotifier::showMessage("Сервер запущен", QMessageBox::Icon::Information);
 }
 
+/*! @brief Отправка сообщения клиенту
+ *
+ *  @return void
+*/
 void MainWindow::sendMessageToClient()
 {
     QString textMessage = ui->chatMessageTextEdit->toPlainText();
@@ -50,18 +60,33 @@ void MainWindow::sendMessageToClient()
     ui->chatMessageTextEdit->clear();
 }
 
+/*! @brief Событие при подключении клиента к серверу
+ *
+ *  @return void
+*/
 void MainWindow::onSocketConnected()
 {
     updateEvents("Клиент подключился");
     ui->clientOnlineLabel->setText("Клиент подключен");
 }
 
+/*! @brief Событие при отключении клиента от сервера
+ *
+ *  @return void
+*/
 void MainWindow::onSocketDisconnected()
 {
     updateEvents("Клиент отключился");
     ui->clientOnlineLabel->setText("Клиент отключён");
 }
 
+/*! @brief Добавления сообщения в чат
+ *
+ *  @param t_senderName Имя отправителя
+ *  @param t_textMessage Текст сообщения
+ *
+ *  @return void
+*/
 void MainWindow::addMessageToChat(const QString t_senderName, const QString t_textMessage)
 {
     QString chatMessages = ui->chatTextBrowser->toPlainText();
@@ -70,12 +95,22 @@ void MainWindow::addMessageToChat(const QString t_senderName, const QString t_te
                                     t_senderName, t_textMessage));
 }
 
+/*! @brief Обновление событий сервера
+ *
+ *  @param t_newEvent Текст нового события
+ *
+ *  @return void
+*/
 void MainWindow::updateEvents(const QString t_newEvent)
 {
     QString shownEvents = ui->eventsTextBrowser->toPlainText();
     ui->eventsTextBrowser->setText(shownEvents + "\n" + t_newEvent);
 }
 
+/*! @brief Установка сигналов сервера
+ *
+ *  @return void
+*/
 void MainWindow::setServerSignals()
 {
     disconnect(m_chatServer, &ChatServerModelView::clientConnected, this, &MainWindow::onSocketConnected);
