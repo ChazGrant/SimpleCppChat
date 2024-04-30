@@ -55,8 +55,6 @@ void MainWindow::sendMessageToClient()
         return UserNotifier::showMessage(errorMessage, QMessageBox::Icon::Critical);
     }
 
-    QString senderName = m_chatServer->getSenderName();
-    addMessageToChat(senderName, textMessage);
     ui->chatMessageTextEdit->clear();
 }
 
@@ -76,6 +74,9 @@ void MainWindow::onSocketConnected()
 */
 void MainWindow::onSocketDisconnected()
 {
+    if (m_chatServer->getLastSentMessage().size()) {
+        UserNotifier::showMessage("Последнее сообщение не было доставлено из-за обрыва соединения", QMessageBox::Icon::Critical);
+    }
     updateEvents("Клиент отключился");
     ui->clientOnlineLabel->setText("Клиент отключён");
 }
@@ -87,7 +88,7 @@ void MainWindow::onSocketDisconnected()
  *
  *  @return void
 */
-void MainWindow::addMessageToChat(const QString t_senderName, const QString t_textMessage)
+void MainWindow::updateChatMessages(const QString t_senderName, const QString t_textMessage)
 {
     QString chatMessages = ui->chatTextBrowser->toPlainText();
     ui->chatTextBrowser->setText(chatMessages +
@@ -115,9 +116,11 @@ void MainWindow::setServerSignals()
 {
     disconnect(m_chatServer, &ChatServerModelView::clientConnected, this, &MainWindow::onSocketConnected);
     disconnect(m_chatServer, &ChatServerModelView::clientDisconnected, this, &MainWindow::onSocketDisconnected);
-    disconnect(m_chatServer, &ChatServerModelView::messsageReceived, this, &MainWindow::addMessageToChat);
+    disconnect(m_chatServer, &ChatServerModelView::messsageReceived, this, &MainWindow::updateChatMessages);
+    disconnect(m_chatServer, &ChatServerModelView::clientReceivedMessage, this, &MainWindow::updateChatMessages);
 
     connect(m_chatServer, &ChatServerModelView::clientConnected, this, &MainWindow::onSocketConnected);
     connect(m_chatServer, &ChatServerModelView::clientDisconnected, this, &MainWindow::onSocketDisconnected);
-    connect(m_chatServer, &ChatServerModelView::messsageReceived, this, &MainWindow::addMessageToChat);
+    connect(m_chatServer, &ChatServerModelView::messsageReceived, this, &MainWindow::updateChatMessages);
+    connect(m_chatServer, &ChatServerModelView::clientReceivedMessage, this, &MainWindow::updateChatMessages);
 }

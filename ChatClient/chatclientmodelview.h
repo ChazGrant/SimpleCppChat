@@ -16,13 +16,11 @@ public:
     ChatClientModelView();
 
     const QString getSenderName();
+    const QString getLastSentMessage();
 
     void connectToServer(QString t_serverAddress, QString t_serverPort, QString &t_errorMessage);
     void disconnectFromServer(QString &t_errorMessage);
     void sendMessage(const QString t_messageText, QString &t_errorMessage);
-
-    //! Последнее отправленное сообщение
-    QString m_lastSentMessage;
 private slots:
     void onSocketConnected();
     void onSocketDisconnected();
@@ -47,6 +45,9 @@ private:
     bool m_messageReceivedByServer = false;
     //! Сокет, котороый подключается к серверу
     QWebSocket *m_chatSocket;
+
+    //! Последнее отправленное сообщение
+    QString m_lastSentMessage;
 
     void setSocketSignals();
 };

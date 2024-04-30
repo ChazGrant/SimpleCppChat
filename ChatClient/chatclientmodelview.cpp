@@ -16,6 +16,15 @@ const QString ChatClientModelView::getSenderName()
     return m_chatSocket->localAddress().toString() + ":" + QString::number(m_chatSocket->localPort());
 }
 
+/*! @brief Получение последнего отправленного сообщения
+ *
+ *  @return const QString
+*/
+const QString ChatClientModelView::getLastSentMessage()
+{
+    return m_lastSentMessage;
+}
+
 /*! @brief Подключение к серверу
  *
  *  @param t_serverAddress Адрес сервера
@@ -69,7 +78,8 @@ void ChatClientModelView::connectToServer(QString t_serverAddress, QString t_ser
 */
 void ChatClientModelView::disconnectFromServer(QString &t_errorMessage)
 {
-    if (!m_connectionEstablished) {
+    qDebug() << m_chatSocket;
+    if (!m_connectionEstablished || m_chatSocket == nullptr) {
         t_errorMessage = "Подключение не установлено";
         return;
     }
@@ -90,7 +100,6 @@ void ChatClientModelView::sendMessage(const QString t_messageText, QString &t_er
     if (!m_messageReceivedByServer && m_lastSentMessage.size()) {
         t_errorMessage = "Прошлое сообщение ещё не было обработано сервером";
         return;
-
     }
     if (!m_connectionEstablished) {
         t_errorMessage = "Вы не подключены к серверу";
@@ -112,7 +121,6 @@ void ChatClientModelView::sendMessage(const QString t_messageText, QString &t_er
 */
 void ChatClientModelView::onSocketConnected()
 {
-    qDebug() << "Socket Connected";
     m_connectionEstablished = true;
     emit chatSocketConnected();
 }
@@ -123,7 +131,6 @@ void ChatClientModelView::onSocketConnected()
 */
 void ChatClientModelView::onSocketDisconnected()
 {
-    qDebug() << "Socket Disconnected";
     m_connectionEstablished = false;
     m_chatSocket = nullptr;
 
@@ -137,9 +144,10 @@ void ChatClientModelView::onSocketDisconnected()
 void ChatClientModelView::onSocketMessageReceived(const QString t_message)
 {
     QWebSocket *senderSocket = qobject_cast<QWebSocket*>(QObject::sender());
+    senderSocket->sendBinaryMessage(QByteArray("received"));
+
     QString socketName = senderSocket->peerAddress().toString() + ":" + QString::number(senderSocket->peerPort());
 
-    qDebug() << "onSocketMessageReceived";
     emit chatSocketMessageReceived(socketName, t_message);
 }
 

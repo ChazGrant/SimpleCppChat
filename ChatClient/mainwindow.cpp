@@ -82,6 +82,9 @@ void MainWindow::onChatSocketConnected()
 */
 void MainWindow::onChatSocketDisconnected()
 {
+    if (m_chatClient->getLastSentMessage().size()) {
+        UserNotifier::showMessage("Последнее сообщение не было доставлено из-за обрыва соединения", QMessageBox::Icon::Critical);
+    }
     ui->serverConnectedLabel->setText("Подключение не установлено");
 }
 

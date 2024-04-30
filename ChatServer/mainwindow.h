@@ -36,7 +36,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    void addMessageToChat(const QString t_senderName, const QString t_textMessage);
+    void updateChatMessages(const QString t_senderName, const QString t_textMessage);
     void updateEvents(const QString t_newEvent);
 
     //! Указатель на ModelView чата

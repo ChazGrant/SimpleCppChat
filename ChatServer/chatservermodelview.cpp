@@ -13,10 +13,22 @@ ChatServerModelView::ChatServerModelView()
     QString errorMessage;
 }
 
-//! @brief Получение адреса сервера
+/*! @brief Получение адреса сервера
+ *
+ *  @return const QString
+*/
 const QString ChatServerModelView::getSenderName()
 {
     return m_server->serverAddress().toString() + ":" + QString::number(m_server->serverPort());
+}
+
+/*! @brief Получение последнего отправленного сообщения
+ *
+ *  @return const QString
+*/
+const QString ChatServerModelView::getLastSentMessage()
+{
+    return m_lastSentMessage;
 }
 
 /*! @brief Запуск сервера
@@ -35,7 +47,6 @@ void ChatServerModelView::startServer(const QString t_serverPort, QString &t_err
         return;
     }
 
-    qDebug() << m_server->isListening();
     if (m_server->isListening()) {
         m_server->close();
     }
@@ -43,7 +54,7 @@ void ChatServerModelView::startServer(const QString t_serverPort, QString &t_err
         m_client->close();
     }
 
-    if (m_server->listen(QHostAddress::Any, serverPort)) {
+    if (!m_server->listen(QHostAddress::Any, serverPort)) {
         t_errorMessage = m_server->errorString();
         return;
     }
@@ -58,18 +69,21 @@ void ChatServerModelView::startServer(const QString t_serverPort, QString &t_err
 */
 void ChatServerModelView::sendMessageToClient(QString t_messageText, QString &t_errorMessage)
 {
+    if (!m_messageReceivedByClient && m_lastSentMessage.size()) {
+        t_errorMessage = "Прошлое сообщение ещё не было доставлено клиенту";
+        return;
+    }
     if (t_messageText.isEmpty()) {
         t_errorMessage = "Сообщение не может быть пустым";
         return;
     }
-
     if (m_client == nullptr) {
         t_errorMessage = "Клиент не подключен";
         return;
     }
 
     m_client->sendTextMessage(t_messageText);
-
+    m_lastSentMessage = t_messageText;
     m_dbAccessor.addMessageToDatabase(getSenderName(), t_messageText, t_errorMessage);
     if (!t_errorMessage.isEmpty()) {
         return;
@@ -91,6 +105,7 @@ void ChatServerModelView::onClientConnected()
     emit clientConnected();
     connect(connectedSocket, &QWebSocket::disconnected, this, &ChatServerModelView::onClientDisconnected);
     connect(connectedSocket, &QWebSocket::textMessageReceived, this, &ChatServerModelView::onMessageReceived);
+    connect(connectedSocket, &QWebSocket::binaryMessageReceived, this, &ChatServerModelView::onClientMessageReceived);
 }
 
 /*! @brief Событие при отключении клиента от сервера
@@ -121,4 +136,18 @@ void ChatServerModelView::onMessageReceived(const QString t_message)
     m_dbAccessor.addMessageToDatabase(senderName, t_message, errorMessage);
 
     emit messsageReceived(senderName, t_message);
+}
+
+/*! @brief Событие срабатываемое когда сервер получил сообщение
+ *
+ *  @return void
+*/
+void ChatServerModelView::onClientMessageReceived(const QByteArray &t_message)
+{
+    const QString receivedMessage = QString(t_message);
+    if (receivedMessage == "received") {
+        m_messageReceivedByClient = true;
+        emit clientReceivedMessage(getSenderName(), m_lastSentMessage);
+        m_lastSentMessage = "";
+    }
 }
